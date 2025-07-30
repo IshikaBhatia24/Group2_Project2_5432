@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login</title>
+    <style>
+        /* Reset */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding-left: 60px;
+
+            background: url('/images/BackgroundImage.jpg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 32, 63, 0.6); /* richer dark blue overlay */
+            z-index: 0;
+        }
+
+        .login-container {
+            background: linear-gradient(145deg, #ffffffcc, #e3e9f3cc);
+            padding: 3rem 3.5rem;
+            border-radius: 15px;
+            box-shadow: 0 25px 40px rgba(15, 32, 63, 0.3);
+            width: 420px;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 35px 50px rgba(15, 32, 63, 0.45);
+        }
+
+        h2 {
+            margin-bottom: 2rem;
+            font-weight: 700;
+            font-size: 2.2rem;
+            color: #0f203f;
+            text-align: center;
+            letter-spacing: 1.2px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        form label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            color: #0f203f;
+            font-size: 1rem;
+            letter-spacing: 0.04em;
+        }
+
+        form input[type="email"],
+        form input[type="password"] {
+            width: 100%;
+            padding: 0.65rem 1rem;
+            margin-bottom: 1.6rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            background: #f0f4ff;
+            box-shadow: inset 3px 3px 6px #d0dbf9, inset -3px -3px 6px #ffffff;
+            transition: box-shadow 0.3s ease;
+            color: #0f203f;
+        }
+
+        form input[type="email"]:focus,
+        form input[type="password"]:focus {
+            outline: none;
+            box-shadow: 0 0 10px 3px #2a6efd;
+            background: #e8f0fe;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            background: linear-gradient(90deg, #2a6efd, #0058d3);
+            color: white;
+            padding: 0.8rem 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(42, 110, 253, 0.6);
+            letter-spacing: 0.06em;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background: linear-gradient(90deg, #0058d3, #2a6efd);
+            box-shadow: 0 8px 20px rgba(42, 110, 253, 0.8);
+        }
+
+        .error-message {
+            background-color: #fce4e4;
+            color: #b42318;
+            padding: 1rem 1.2rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border: 1.5px solid #f8b4b4;
+            font-size: 1rem;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 1px 6px rgba(180, 35, 24, 0.3);
+        }
+
+        p {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 1rem;
+            color: #2f3032;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+
+        p a {
+            color: #1e68f1;
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+
+        p a:hover {
+            color: #dbe3ff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Login</h2>
+
+    <!-- Show error message if login failed -->
+    <div th:if="${param.error}" class="error-message">
+        Invalid email or password. Please try again.
+    </div>
+
+    <form method="post" action="/login">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="username" required />
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required />
+
+        <button type="submit">Login</button>
+    </form>
+
+    <p>Don't have an account? <a href="/register">Register Here</a></p>
+</div>
+</body>
+</html>

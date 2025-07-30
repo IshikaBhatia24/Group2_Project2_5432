@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book a Doctor</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .doctor-card {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(3px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 400px;
+            border-radius: 8px;
+        }
+
+        .close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Available Doctors</h2>
+
+<div th:each="doctor, iterStat : ${doctors}" class="doctor-card">
+    <p><b>Name:</b> <span th:text="${doctor.fullName}"></span></p>
+    <p><b>Specialization:</b> <span th:text="${doctor.specialization}"></span></p>
+    <label>Choose Slot:</label>
+    <select th:id="'slot-select-' + ${iterStat.index}">
+        <option value="10:00–10:30 AM">10:00–10:30 AM</option>
+        <option value="11:00–11:30 AM">11:00–11:30 AM</option>
+        <option value="2:00–2:30 PM">2:00–2:30 PM</option>
+    </select>
+    <button class="btn"
+            th:attr="data-index=${iterStat.index},
+                 data-doctor-id=${doctor.id},
+                 data-doctor-name=${doctor.fullName},
+                 data-specialization=${doctor.specialization}"
+            onclick="openForm(this)">
+        Request
+    </button>
+
+</div>
+
+<!-- Modal -->
+<div class="modal" id="appointment-modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeForm()">&times;</span>
+        <form id="appointment-form" method="post">
+            <input type="hidden" name="doctorId" id="form-doctorId">
+            <input type="hidden" name="slot" id="form-slot">
+            <p><b>Doctor:</b> <span id="form-doctorName"></span></p>
+            <p><b>Specialization:</b> <span id="form-specialization"></span></p>
+
+            <label>Emergency:</label><br>
+            <textarea name="emergency" required rows="2" cols="40"></textarea><br><br>
+
+            <label>Details:</label><br>
+            <textarea name="details" rows="2" cols="40"></textarea><br><br>
+
+            <button type="submit" class="btn">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openForm(button) {
+        const index = button.dataset.index;
+        const doctorId = button.dataset.doctorId;
+        const doctorName = button.dataset.doctorName;
+        const specialization = button.dataset.specialization;
+
+        const slot = document.getElementById("slot-select-" + index).value;
+        document.getElementById("form-doctorId").value = doctorId;
+        document.getElementById("form-slot").value = slot;
+        document.getElementById("form-doctorName").innerText = doctorName;
+        document.getElementById("form-specialization").innerText = specialization;
+
+        document.getElementById("appointment-modal").style.display = "flex";
+    }
+
+    function closeForm() {
+        document.getElementById("appointment-modal").style.display = "none";
+    }
+
+    // Submit the form using JavaScript to stay on the same page
+    document.getElementById("appointment-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        fetch('/patient/book', {
+            method: 'POST',
+            body: formData
+        }).then(response => response.text())
+            .then(result => {
+                if (result === 'success') {
+                    alert("Request Sent!");
+                    window.location.href = "/patient/dashboard";
+                } else {
+                    alert("Something went wrong!");
+                }
+
+            });
+    });
+</script>
+
+</body>
+</html>
