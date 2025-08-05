@@ -10,10 +10,17 @@
 <form th:action="@{/patient/request-appointment}" method="post">
     <input type="hidden" name="doctorId" th:value="${doctor.id}" />
     <input type="hidden" name="slot" th:value="${slot}" />
+    <input type="hidden" name="date" th:value="${date}" />
 
     <p><strong>Doctor:</strong> <span th:text="${doctor.fullName}">Dr. Name</span></p>
-    <p><strong>Specialization:</strong> <span th:text="${doctor.specialization}">Cardiology</span></p>
-    <p><strong>Selected Time Slot:</strong> <span th:text="${slot}">10:00-10:30 AM</span></p>
+
+    <p><strong>Specialization:</strong>
+        <span th:text="${doctor.doctorProfile != null ? doctor.doctorProfile.specialization : 'N/A'}">Cardiology</span>
+    </p>
+
+    <p><strong>Selected Date:</strong> <span th:text="${#dates.format(date, 'dd MMM yyyy')}">01 Jan 2025</span></p>
+
+    <p><strong>Selected Time Slot:</strong> <span th:text="${slot}">10:00–10:30 AM</span></p>
 
     <label for="emergency">Medical Emergency:</label><br />
     <textarea id="emergency" name="emergency" rows="4" required></textarea><br /><br />
@@ -21,7 +28,7 @@
     <label for="details">Additional Details (optional):</label><br />
     <textarea id="details" name="details" rows="3"></textarea><br /><br />
 
-    <button type="submit">Submit Request</button>
+    <button type="submit">Submit</button>
 </form>
 
 <a href="/patient/doctors">Back to Doctor List</a>

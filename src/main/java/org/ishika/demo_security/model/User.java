@@ -4,26 +4,27 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "users")
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique=true, nullable=false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable=false)
     private String password;
 
-    @Column(nullable = false)
-    private String role;  // "ROLE_PATIENT" or "ROLE_DOCTOR"
+    @Column(nullable=false)
+    private String role; // "ROLE_PATIENT" or "ROLE_DOCTOR"
 
-    // Common profile fields
     private String fullName;
-
-    // Doctor-specific fields
-    private String specialization;  // null for patients
     private String phoneNumber;
 
+    // One-to-one profile relationships
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private PatientProfile patientProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private DoctorProfile doctorProfile;
     public Long getId() {
         return id;
     }
@@ -64,14 +65,6 @@ public class User {
         this.fullName = fullName;
     }
 
-    public String getSpecialization() {
-        return specialization;
-    }
-
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -80,5 +73,13 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 // getters and setters
+
+    public DoctorProfile getDoctorProfile() {
+        return doctorProfile;
+    }
+
+    public void setDoctorProfile(DoctorProfile doctorProfile) {
+        this.doctorProfile = doctorProfile;
+    }
 }
 

@@ -57,21 +57,33 @@
 
 <div th:each="doctor, iterStat : ${doctors}" class="doctor-card">
     <p><b>Name:</b> <span th:text="${doctor.fullName}"></span></p>
-    <p><b>Specialization:</b> <span th:text="${doctor.specialization}"></span></p>
+    <p><b>Specialization:</b>
+        <span th:text="${doctor.doctorProfile != null ? doctor.doctorProfile.specialization : 'N/A'}"></span>
+    </p>
+
+    <label>Choose Date:</label>
+    <input type="date" id="date-select-[[${iterStat.index}]]" name="date" required />
+
     <label>Choose Slot:</label>
     <select th:id="'slot-select-' + ${iterStat.index}">
         <option value="10:00–10:30 AM">10:00–10:30 AM</option>
         <option value="11:00–11:30 AM">11:00–11:30 AM</option>
         <option value="2:00–2:30 PM">2:00–2:30 PM</option>
     </select>
+
+
+
+
     <button class="btn"
-            th:attr="data-index=${iterStat.index},
-                 data-doctor-id=${doctor.id},
-                 data-doctor-name=${doctor.fullName},
-                 data-specialization=${doctor.specialization}"
+            th:attr="
+data-index=${iterStat.index},
+data-doctor-id=${doctor.id},
+data-doctor-name=${doctor.fullName},
+data-specialization=${doctor.doctorProfile != null ? doctor.doctorProfile.specialization : 'N/A'}"
             onclick="openForm(this)">
         Request
     </button>
+
 
 </div>
 
@@ -82,6 +94,8 @@
         <form id="appointment-form" method="post">
             <input type="hidden" name="doctorId" id="form-doctorId">
             <input type="hidden" name="slot" id="form-slot">
+            <input type="hidden" id="form-date" name="date" />
+
             <p><b>Doctor:</b> <span id="form-doctorName"></span></p>
             <p><b>Specialization:</b> <span id="form-specialization"></span></p>
 

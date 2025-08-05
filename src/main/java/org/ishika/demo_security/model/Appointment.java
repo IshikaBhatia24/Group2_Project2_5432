@@ -3,6 +3,8 @@ package org.ishika.demo_security.model;
 import jakarta.persistence.*;
 import org.ishika.demo_security.model.AppointmentStatus;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "appointments") // Explicitly set table name
 public class Appointment {
@@ -31,6 +33,9 @@ public class Appointment {
 
     @Column(name = "details", length = 1000)
     private String details;
+
+    @Column(name = "date")
+    private LocalDate date;
 
     // --- Getters and Setters ---
 
@@ -106,6 +111,13 @@ public class Appointment {
         this.status = status;
     }
 
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
 
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;

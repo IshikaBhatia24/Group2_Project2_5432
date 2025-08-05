@@ -1,190 +1,335 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Patient Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
+        /* BODY & GENERAL */
         body {
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f2f4f8;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #343a40;
         }
 
+        /* SIDEBAR */
         .sidebar {
-            width: 240px;
+            width: 260px;
             height: 100vh;
-            background-color: #2f3e46; /* soft dark slate */
-            color: #ffffff;
-            padding: 2rem 1rem;
+            background: linear-gradient(180deg, #007bff, #0056b3);
+            color: white;
+            padding: 2.5rem 1.5rem;
             position: fixed;
             top: 0;
             left: 0;
+            overflow-y: auto;
+            box-shadow: 3px 0 15px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar h3 {
-            color: #e0f7fa;
+            font-weight: 700;
+            font-size: 1.85rem;
             margin-bottom: 2rem;
-            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #fff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 0.6rem;
         }
 
         .sidebar a {
-            color: #d2d6dc;
-            text-decoration: none;
             display: block;
-            margin: 1rem 0;
-            font-size: 1rem;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            transition: background-color 0.2s ease;
+            font-weight: 600;
+            color: #dce7ff;
+            text-decoration: none;
+            margin-bottom: 0.9rem;
+            padding: 0.55rem 1rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .sidebar a:hover {
-            background-color: #3d4f58;
-        }
-
-        .main-content {
-            margin-left: 260px;
-            padding: 2rem;
-        }
-
-        .card-custom {
-            background-color: #ffffff;
-            border: none;
-            border-left: 5px solid #4db6ac;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .card-custom h5 {
-            color: #2c3e50;
-        }
-
-        .table th {
-            background-color: #e0f2f1;
-        }
-
-        .btn-primary {
-            background-color: #4db6ac;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: #39998f;
-        }
-
-        .btn-outline-primary {
-            color: #4db6ac;
-            border-color: #4db6ac;
-        }
-
-        .btn-outline-primary:hover {
-            background-color: #4db6ac;
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.15);
             color: white;
         }
 
-        .btn-danger {
-            margin-top: 1rem;
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 260px;
+            padding: 2.5rem 3rem;
+            min-height: 100vh;
         }
 
-        .text-muted {
-            color: #6c757d !important;
+        /* HEADER */
+        .main-content h2 {
+            font-weight: 700;
+            font-size: 2.4rem;
+            color: #2c3e50;
+            margin-bottom: 1.2rem;
+        }
+
+        /* CARDS */
+        .card-custom {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgb(0 0 0 / 0.08);
+            border: none;
+            padding: 1.75rem 2rem;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card-custom:hover {
+            box-shadow: 0 10px 25px rgb(0 0 0 / 0.15);
+        }
+
+        .card-custom h5 {
+            font-weight: 700;
+            color: #1c2833;
+            margin-bottom: 1rem;
+            letter-spacing: 0.04em;
+        }
+
+        .card-custom p {
+            font-size: 1rem;
+            color: #556477;
+        }
+
+        /* TABLE */
+        .table {
+            border-collapse: separate !important;
+            border-spacing: 0 12px !important; /* spacing between rows */
+        }
+
+        .table thead tr th {
+            background-color: #e9f0fb;
+            color: #2c3e50;
+            font-weight: 700;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.06em;
+        }
+
+        .table tbody tr {
+            background-color: white;
+            box-shadow: 0 3px 6px rgb(0 0 0 / 0.1);
+            border-radius: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f0f7ff;
+        }
+
+        .table td {
+            vertical-align: middle;
+            padding: 1rem 1.4rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        /* STATUS BADGES */
+        .badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            text-transform: uppercase;
+        }
+
+        .badge-pending {
+            background-color: #ffc107;
+            color: #856404;
+        }
+
+        .badge-confirmed {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-cancelled {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            font-weight: 600;
+            padding: 0.6rem 1.3rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            box-shadow: 0 0 12px rgba(0, 86, 179, 0.6);
+        }
+
+        .btn-outline-primary {
+            border-color: #007bff;
+            color: #007bff;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 0.45rem 1rem;
+            font-size: 0.875rem;
+            box-shadow: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 991px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 1.5rem;
+                box-shadow: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+
+            .table thead {
+                display: none; /* For smaller devices, hide headers and make list view */
+            }
+
+            .table tbody tr {
+                display: block;
+                margin-bottom: 1.5rem;
+                box-shadow: 0 3px 10px rgb(0 0 0 / 0.12);
+            }
+
+            .table tbody tr td {
+                display: flex;
+                justify-content: space-between;
+                padding: 0.8rem 1rem;
+                border-bottom: 1px solid #dee2e6;
+                font-weight: 600;
+            }
+
+            .table tbody tr td::before {
+                content: attr(data-label);
+                color: #6c757d;
+                font-weight: 500;
+                text-transform: uppercase;
+                margin-right: 0.75rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div class="sidebar">
+<nav class="sidebar">
     <h3>Patient Panel</h3>
-    <a href="/patient/dashboard">Dashboard</a>
+    <a href="/patient/dashboard" class="active">Dashboard</a>
     <a href="/patient/appointments">My Appointments</a>
     <a href="/patient/doctors">Book a Doctor</a>
     <a href="/patient/profile">Profile</a>
-    <a href="/patient/medical-records">Medical Records</a>
-    <a href="/patient/billing">Billing</a>
-    <a href="/patient/settings">Settings</a>
     <a href="/logout">Logout</a>
-</div>
+</nav>
 
-<div class="main-content">
-    <h2 class="mb-4">Welcome, <span th:text="${#authentication.name}">Patient</span>!</h2>
+<main class="main-content">
+    <h2>Welcome, <span th:text="${patientName}">Patient</span>!</h2>
 
-    <!-- Upcoming Appointments -->
-    <div class="card card-custom mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Upcoming Appointments</h5>
-            <div th:if="${appointments != null and #lists.isEmpty(appointments) == false}">
-                <table class="table table-striped mt-3">
-                    <thead>
-                    <tr>
-                        <th>Date & Time</th>
-                        <th>Doctor</th>
-                        <th>Specialization</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="appt : ${appointments}">
-                        <td th:text="${appt.dateTime}">2025-08-01 10:00 AM</td>
-                        <td th:text="${appt.doctor.fullName}">Dr. John</td>
-                        <td th:text="${appt.doctor.specialization}">Cardiology</td>
-                        <td th:text="${appt.status}">Confirmed</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div th:if="${appointments == null or #lists.isEmpty(appointments)}">
-                <p class="mt-3 text-muted">You have no upcoming appointments.</p>
-            </div>
+
+    <!-- Upcoming Appointments Card -->
+    <section class="card-custom mb-5">
+        <h5>Upcoming Appointments</h5>
+        <div th:if="${appointments != null and #lists.isEmpty(appointments) == false}" class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Doctor</th>
+                    <th scope="col">Specialization</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="appt : ${appointments}">
+                    <!-- Assuming appt.date is a LocalDate and appt.slot contains time info -->
+                    <td data-label="Date" th:text="${#dates.format(appt.date, 'dd MMM yyyy')}">01 Aug 2025</td>
+                    <td data-label="Time" th:text="${appt.slot}">10:00 AM</td>
+                    <td data-label="Doctor" th:text="${appt.doctorName}">Dr. John</td>
+                    <td data-label="Specialization" th:text="${appt.specialization}">Cardiology</td>
+                    <td data-label="Status">
+            <span th:switch="${appt.status.name()}">
+                <span th:case="'PENDING'" class="badge badge-pending">Pending</span>
+                <span th:case="'CONFIRMED'" class="badge badge-confirmed">Confirmed</span>
+                <span th:case="'CANCELLED'" class="badge badge-cancelled">Cancelled</span>
+            </span>
+                    </td>
+                    <td data-label="Actions">
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                th:attr="data-appointment-id=${appt.id}"
+                                onclick="withdrawAppointment(this)">
+                            Withdraw
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
         </div>
-    </div>
-
-    <!-- Book Doctor -->
-    <div class="card card-custom mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Need to see a Doctor?</h5>
-            <p class="card-text">Find a doctor by specialization and book your appointment online.</p>
-            <a href="/patient/doctors" class="btn btn-primary">Book Appointment</a>
+        <div th:if="${appointments == null or #lists.isEmpty(appointments)}" class="py-4 text-center text-muted fs-5">
+            You have no upcoming appointments.
         </div>
-    </div>
+    </section>
+
+    <!-- Book Doctor Card -->
+    <section class="card-custom mb-5 text-center">
+        <h5>Need to see a Doctor?</h5>
+        <p>Find a doctor by specialization and book your appointment online.</p>
+        <a href="/patient/doctors" class="btn btn-primary btn-lg px-4">Book Appointment</a>
+    </section>
 
     <!-- Quick Access Cards -->
-    <div class="row">
-        <div class="col-md-4 mb-3">
-            <div class="card card-custom">
-                <div class="card-body">
-                    <h6>Profile</h6>
-                    <p class="text-muted">Update your personal info and contact details.</p>
-                    <a href="/patient/profile" class="btn btn-outline-primary btn-sm">Go to Profile</a>
-                </div>
+    <section class="row g-4">
+        <div class="col-md-4">
+            <div class="card-custom h-100">
+                <h6>Profile</h6>
+                <p class="text-muted">Update your personal info and contact details.</p>
+                <a href="/patient/profile" class="btn btn-outline-primary btn-sm">Go to Profile</a>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <div class="card card-custom">
-                    <div class="card-body">
-                        <h6>Medical Records</h6>
-                        <p class="text-muted">View and download your medical history.</p>
-                        <a href="/patient/medical-records" class="btn btn-outline-primary btn-sm">View Records</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <div class="card card-custom">
-                    <div class="card-body">
-                        <h6>Billing</h6>
-                        <p class="text-muted">Check your billing and payment history.</p>
-                        <a href="/patient/billing" class="btn btn-outline-primary btn-sm">View Bills</a>
-                    </div>
-                </div>
+        <div class="col-md-4">
+            <div class="card-custom h-100">
+                <h6>Medical Records</h6>
+                <p class="text-muted">View and download your medical history.</p>
+                <a href="/patient/medical-records" class="btn btn-outline-primary btn-sm">View Records</a>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="card-custom h-100">
+                <h6>Billing</h6>
+                <p class="text-muted">Check your billing and payment history.</p>
+                <a href="/patient/billing" class="btn btn-outline-primary btn-sm">View Bills</a>
+            </div>
+        </div>
+    </section>
+</main>
 
-    </div>
-
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

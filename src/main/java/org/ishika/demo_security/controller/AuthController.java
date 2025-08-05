@@ -1,7 +1,12 @@
 package org.ishika.demo_security.controller;
 
+import org.ishika.demo_security.Repository.PatientProfileRepository;
+import org.ishika.demo_security.Repository.DoctorProfileRepository;
 import org.ishika.demo_security.Repository.UserRepository;
+import org.ishika.demo_security.model.PatientRegistrationForm;
 import org.ishika.demo_security.model.User;
+import org.ishika.demo_security.model.PatientProfile;
+import org.ishika.demo_security.model.DoctorProfile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,13 +16,20 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final PatientProfileRepository patientProfileRepository;
+    private final DoctorProfileRepository doctorProfileRepository;
     private final PasswordEncoder passwordEncoder;
+    private PatientRegistrationForm patientRegisterationForm;
 
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthController(UserRepository userRepository,
+                          PatientProfileRepository patientProfileRepository,
+                          DoctorProfileRepository doctorProfileRepository,
+                          PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.patientProfileRepository = patientProfileRepository;
+        this.doctorProfileRepository = doctorProfileRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     @GetMapping("/register")
     public String showRegisterOptions() {
@@ -26,31 +38,52 @@ public class AuthController {
 
     @GetMapping("/register/patient")
     public String showPatientRegisterForm(Model model) {
-        model.addAttribute("user", new User());
-        return "patient-register"; // new template for patient registration
+        PatientRegistrationForm form = new PatientRegistrationForm();
+        form.setUser(new User());
+        form.setPatientProfile(new PatientProfile());
+        model.addAttribute("form", form);
+        return "patient-register";
     }
 
     @PostMapping("/register/patient")
-    public String registerPatient(@ModelAttribute User user) {
+    public String registerPatient(@ModelAttribute("form") PatientRegistrationForm form, Model model) {
+        User user = form.getUser();
+        // Check if email exists
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            model.addAttribute("error", "A user with this email already exists.");
+            return "patient-register"; // Show registration page with error
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole("ROLE_PATIENT");
         userRepository.save(user);
+        PatientProfile profile = form.getPatientProfile();
+        profile.setUser(user); // link user to profile
+        patientProfileRepository.save(profile);
         return "redirect:/login";
     }
+
 
     @GetMapping("/register/doctor")
     public String showDoctorRegisterForm(Model model) {
         model.addAttribute("user", new User());
-        return "doctor-register"; // new template for doctor registration
+        model.addAttribute("doctorProfile", new DoctorProfile());
+        return "doctor-register"; // new Thymeleaf template for doctor registration with profile fields
     }
 
     @PostMapping("/register/doctor")
-    public String registerDoctor(@ModelAttribute User user) {
+    public String registerDoctor(@ModelAttribute User user, @ModelAttribute DoctorProfile doctorProfile, Model model) {
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            model.addAttribute("error", "A user with this email already exists.");
+            return "doctor-register"; // Show registration page with error
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole("ROLE_DOCTOR");
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        doctorProfile.setUser(savedUser);
+        doctorProfileRepository.save(doctorProfile);
         return "redirect:/login";
     }
+
 
     @GetMapping("/login")
     public String login() {
