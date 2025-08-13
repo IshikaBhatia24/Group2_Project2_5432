@@ -5,6 +5,7 @@ import org.ishika.demo_security.Repository.PatientProfileRepository;
 import org.ishika.demo_security.Repository.UserRepository;
 import org.ishika.demo_security.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.ui.Model;
 
 import org.springframework.stereotype.Controller;
@@ -20,8 +21,6 @@ import java.util.Optional;
 @RequestMapping("/patient")
 public class PatientController {
 
-
-
     @Autowired
     private UserRepository userRepository;
 
@@ -31,24 +30,16 @@ public class PatientController {
     @Autowired
     private PatientProfileRepository patientProfileRepository;
 
-//    public PatientController(UserRepository userRepository) {
-//        this.userRepository = userRepository;
-//    }
-
     @GetMapping("/dashboard")
     public String patientDashboard(Model model, Principal principal) {
         User currentUser = userRepository.findByEmail(principal.getName());
 
         model.addAttribute("appointments", appointmentRepository.findByPatientId(currentUser.getId()));
 
-        // Add full name attribute to model
         model.addAttribute("patientName", currentUser.getFullName());
 
         return "patient-dashboard";
     }
-
-
-
 
     @GetMapping("/doctors")
     public String showDoctorBookingPage(Model model) {
@@ -79,54 +70,47 @@ public class PatientController {
         User doctor = userRepository.findById(doctorId).orElse(null);
         User patient = userRepository.findByEmail(principal.getName());
 
-        if (doctor == null || patient == null) return "Invalid doctor or patient.";
-
-//        List<Appointment> existingAppointments = appointmentRepository
-//                .findByDoctorIdAndDateAndSlotAndStatusNot(doctorId, parsedDate, slot, AppointmentStatus.CANCELLED);
-//        if (!existingAppointments.isEmpty()) {
-//            return "Appointment slot is already taken.";
-//        }
-
-        // Check if already confirmed appointment exists for the doctor, slot, and date:
-        List<Appointment> confirmedAppointments = appointmentRepository
-                .findByDoctorIdAndDateAndSlotAndStatus(doctorId, parsedDate, slot, AppointmentStatus.CONFIRMED);
-
-        if (!confirmedAppointments.isEmpty()) {
-            return "This slot is already confirmed for another patient.";
+        if (doctor == null || patient == null) {
+            return "Invalid doctor or patient.";
         }
 
+        boolean slotTaken = !appointmentRepository
+                .findByDoctorIdAndDateAndSlotAndStatusNot(
+                        doctorId, parsedDate, slot, AppointmentStatus.CANCELLED
+                ).isEmpty();
 
+        if (slotTaken) {
+            return "This slot is already booked by another patient.";
+        }
+
+        // Create and save new appointment
         Appointment appt = new Appointment();
         appt.setDoctorId(doctor.getId());
         appt.setDoctorName(doctor.getFullName());
-        if (doctor.getDoctorProfile() != null) {
-            appt.setSpecialization(doctor.getDoctorProfile().getSpecialization());
-        } else {
-            appt.setSpecialization("N/A");
-        }
-
+        appt.setSpecialization(
+                doctor.getDoctorProfile() != null
+                        ? doctor.getDoctorProfile().getSpecialization()
+                        : "N/A"
+        );
         appt.setSlot(slot);
         appt.setEmergency(emergency);
         appt.setDetails(details);
         appt.setPatientId(patient.getId());
-
-//        LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
         appt.setDate(parsedDate);
-
-        appt.setStatus(AppointmentStatus.PENDING);
+        appt.setStatus(AppointmentStatus.PENDING); // starts as pending
 
         appointmentRepository.save(appt);
+
         return "success";
     }
+
 
     @PostMapping("/request-appointment")
     public String handleAppointmentRequest(@RequestParam Long doctorId,
                                            @RequestParam String slot,
                                            @RequestParam String emergency,
                                            @RequestParam(required = false) String details) {
-        // TODO: Create and save Appointment entity (or AppointmentRequest)
 
-        // Optional: You can log for now to verify it's called
         System.out.println("Doctor ID: " + doctorId);
         System.out.println("Slot: " + slot);
         System.out.println("Emergency: " + emergency);
@@ -136,15 +120,37 @@ public class PatientController {
         return "redirect:/patient/dashboard";
         }
 
+    @GetMapping("/check-slot")
+    @ResponseBody
+    public boolean checkSlot(@RequestParam Long doctorId,
+                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                             @RequestParam String slot) {
+        return appointmentRepository
+                .existsByDoctorIdAndDateAndSlotAndStatusNot(
+                        doctorId, date, slot, AppointmentStatus.CANCELLED
+                );
+    }
+
+    @DeleteMapping("/delete-appointment/{id}")
+    @ResponseBody
+    public String deleteAppointment(@PathVariable Long id, Principal principal) {
+        User patient = userRepository.findByEmail(principal.getName());
+
+        Optional<Appointment> apptOpt = appointmentRepository.findById(id);
+        if (apptOpt.isEmpty() || !apptOpt.get().getPatientId().equals(patient.getId())) {
+            return "error"; // not found or not owned by this patient
+        }
+
+        appointmentRepository.deleteById(id);
+        return "success";
+    }
+
     @GetMapping("/profile")
     public String patientProfile(Model model, Principal principal) {
-        // Fetch current user
         User user = userRepository.findByEmail(principal.getName());
 
-        // If you use composition with profile object:
         PatientProfile patientProfile = patientProfileRepository.findByUser(user);
 
-        // Create a wrapper object to send to the template
         PatientRegistrationForm form = new PatientRegistrationForm();
         form.setUser(user);
         form.setPatientProfile(patientProfile);
@@ -162,14 +168,10 @@ public class PatientController {
             return "redirect:/patient/profile?error";
         }
 
-        // Update user fields
         currentUser.setPhoneNumber(form.getUser().getPhoneNumber());
-        // If you want to allow name edit, uncomment:
-        // currentUser.setFullName(form.getUser().getFullName());
 
         userRepository.save(currentUser);
 
-        // Update PatientProfile fields
         PatientProfile currentProfile = currentUser.getPatientProfile();
         if (currentProfile != null && form.getPatientProfile() != null) {
             PatientProfile formProfile = form.getPatientProfile();
@@ -180,17 +182,39 @@ public class PatientController {
             currentProfile.setCountry(formProfile.getCountry());
             currentProfile.setZipCode(formProfile.getZipCode());
             currentProfile.setEmergencyContact(formProfile.getEmergencyContact());
-            // Add more fields here as necessary
-            // e.g. payment info or others
 
-            // Save profile
             patientProfileRepository.save(currentProfile);
         }
 
         return "redirect:/patient/profile?success";
     }
 
+    @GetMapping("/appointments")
+    public String patientAppointments(Model model, Principal principal) {
+        // Fetch current patient
+        User currentUser = userRepository.findByEmail(principal.getName());
+        if (currentUser == null) {
+            return "redirect:/login?error";
+        }
 
+        // Fetch all appointments for this patient
+        List<Appointment> appointments = appointmentRepository.findByPatientId(currentUser.getId());
+
+        model.addAttribute("appointments", appointments);
+        model.addAttribute("patientName", currentUser.getFullName());
+
+        return "patient-appointments"; // Thymeleaf template for appointments page
+    }
+
+    @GetMapping("/billing")
+    public String patientBilling() {
+        return "patient-billing";
+    }
+
+    @GetMapping("/medical-records")
+    public String patientMedicalRecords() {
+        return "patient-medical-records";
+    }
 
 
 

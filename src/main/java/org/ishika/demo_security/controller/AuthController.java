@@ -3,10 +3,7 @@ package org.ishika.demo_security.controller;
 import org.ishika.demo_security.Repository.PatientProfileRepository;
 import org.ishika.demo_security.Repository.DoctorProfileRepository;
 import org.ishika.demo_security.Repository.UserRepository;
-import org.ishika.demo_security.model.PatientRegistrationForm;
-import org.ishika.demo_security.model.User;
-import org.ishika.demo_security.model.PatientProfile;
-import org.ishika.demo_security.model.DoctorProfile;
+import org.ishika.demo_security.model.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +17,7 @@ public class AuthController {
     private final DoctorProfileRepository doctorProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private PatientRegistrationForm patientRegisterationForm;
+    private DoctorRegistrationForm doctorRegistrationForm;
 
     public AuthController(UserRepository userRepository,
                           PatientProfileRepository patientProfileRepository,

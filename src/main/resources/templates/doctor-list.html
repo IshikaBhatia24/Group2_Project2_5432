@@ -17,7 +17,7 @@
         h2 {
             text-align: center;
             margin-bottom: 30px;
-            color: #007bff;
+            color: #2c3e50;
             font-weight: 700;
             font-size: 2rem;
         }
@@ -238,14 +238,30 @@
             return;
         }
 
-        document.getElementById("form-doctorId").value = doctorId;
-        document.getElementById("form-slot").value = slot;
-        document.getElementById("form-date").value = dateInput.value;
-        document.getElementById("form-doctorName").innerText = doctorName;
-        document.getElementById("form-specialization").innerText = specialization;
+        // Check slot availability before showing modal
+        fetch(`/patient/check-slot?doctorId=${doctorId}&date=${dateInput.value}&slot=${encodeURIComponent(slot)}`)
+            .then(res => res.json())
+            .then(isTaken => {
+                if (isTaken) {
+                    alert("⚠ This slot is already booked. Please choose another.");
+                    return;
+                }
 
-        document.getElementById("appointment-modal").style.display = "flex";
+                // Slot is free → populate form fields and show modal
+                document.getElementById("form-doctorId").value = doctorId;
+                document.getElementById("form-slot").value = slot;
+                document.getElementById("form-date").value = dateInput.value;
+                document.getElementById("form-doctorName").innerText = doctorName;
+                document.getElementById("form-specialization").innerText = specialization;
+
+                document.getElementById("appointment-modal").style.display = "flex";
+            })
+            .catch(err => {
+                console.error("Error checking slot:", err);
+                alert("An error occurred while checking slot availability.");
+            });
     }
+
 
     function closeForm() {
         document.getElementById("appointment-modal").style.display = "none";
@@ -274,7 +290,7 @@
                     alert("Request Sent!");
                     window.location.href = "/patient/dashboard";
                 } else {
-                    alert("Something went wrong!");
+                    alert("Slot Not Available");
                     console.error("Server response:", result);
                 }
             })

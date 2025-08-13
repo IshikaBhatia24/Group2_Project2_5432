@@ -279,10 +279,8 @@
                 <span th:case="'CANCELLED'" class="badge badge-cancelled">Cancelled</span>
             </span>
                     </td>
-                    <td data-label="Actions">
-                        <button type="button" class="btn btn-sm btn-outline-danger"
-                                th:attr="data-appointment-id=${appt.id}"
-                                onclick="withdrawAppointment(this)">
+                    <td>
+                        <button th:onclick="'withdrawAppointment(' + ${appt.id} + ')'" class="btn btn-danger">
                             Withdraw
                         </button>
                     </td>
@@ -329,7 +327,29 @@
     </section>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function withdrawAppointment(apptId) {
+        if (!confirm("Are you sure you want to withdraw this appointment?")) return;
+
+        fetch(`/patient/delete-appointment/${apptId}`, { method: 'DELETE' })
+            .then(res => res.text())
+            .then(result => {
+                if (result === 'success') {
+                    alert("Appointment withdrawn successfully.");
+                    location.reload(); // refresh page
+                } else {
+                    alert("Error: Could not withdraw appointment.");
+                }
+            })
+            .catch(err => {
+                console.error("Error deleting appointment:", err);
+                alert("An error occurred.");
+            });
+    }
+</script>
+
 </body>
 
 </html>
+
+

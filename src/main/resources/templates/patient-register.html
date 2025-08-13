@@ -9,194 +9,249 @@
             height: 100%;
             margin: 0;
             background: #f4f8fc;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
         .main-wrap {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2.5rem;
             padding: 2.5rem;
-        }
-        .equal-panel {
-            flex: 1 1 0;
-            max-width: 520px;
-            min-width: 340px;
-            min-height: 560px;
-            height: 100%;
-            border-radius: 1.1rem;
-            box-shadow: 0 8px 32px rgba(16, 60, 120, 0.07);
         }
         .reg-card {
             background: #fff;
             padding: 2.6rem 2.2rem 2rem 2.2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        p{
-            text-align: center;
+            border-radius: 1.1rem;
+            box-shadow: 0 8px 32px rgba(16, 60, 120, 0.07);
+            max-width: 520px;
+            width: 100%;
         }
         .form-title {
             color: #124c78;
             font-size: 2rem;
             font-weight: 700;
             margin-bottom: 1.5rem;
-            letter-spacing: 0.02em;
             text-align: center;
         }
-        .form-step { display: none; }
-        .form-step.active { display: block; }
-        .form-control, .form-check-input { border-radius: 0.6rem; }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        label { font-weight: 600; }
         .btn-group {
             display: flex;
             justify-content: space-between;
             margin-top: 2rem;
             gap: 1rem;
         }
-        .image-side {
-            background: url('/images/image2.jpg') center center / cover no-repeat;
-        }
-        @media (max-width: 1200px) {
-            .main-wrap { gap: 1.2rem; padding: 1.2rem; }
-            .equal-panel { min-width: 240px; max-width: 410px; }
-        }
-        @media (max-width: 900px) {
-            .main-wrap {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 1.2rem;
-            }
-            .equal-panel { max-width: 95vw; min-height: 320px; }
-        }
-        @media (max-width: 600px) {
-            .main-wrap { padding: 0.5rem; }
-            .equal-panel { min-width: unset; max-width: 98vw; padding: 1.4rem 0.6rem; }
-            .image-side { display: none; }
-        }
+        p { text-align: center; margin-top: 1rem; }
+        .form-step { display: none; }
+        .form-step.active { display: block; }
     </style>
 </head>
 <body>
 <div class="main-wrap">
-    <div class="reg-card equal-panel">
+    <div class="reg-card">
         <div class="form-title">Sign Up</div>
         <form method="post" action="/register/patient" th:object="${form}" autocomplete="off">
+
             <!-- Step 1: Basic Info -->
             <div class="form-step active" id="step1">
                 <div class="mb-3">
-                    <label for="fullName" class="form-label">Full Name</label>
+                    <label for="fullName">Full Name</label>
                     <input id="fullName" type="text" th:field="*{user.fullName}" class="form-control" required />
+                    <div class="invalid-feedback"></div>
                 </div>
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email">Email</label>
                     <input id="email" type="email" th:field="*{user.email}" class="form-control" required />
+                    <div class="invalid-feedback"></div>
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
+                    <label for="password">Password</label>
                     <input id="password" type="password" th:field="*{user.password}" class="form-control" required />
+                    <div class="invalid-feedback"></div>
                 </div>
                 <div class="mb-3">
-                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                    <label for="phoneNumber">Phone Number</label>
                     <input id="phoneNumber" type="text" th:field="*{user.phoneNumber}" class="form-control" required />
+                    <div class="invalid-feedback"></div>
                 </div>
                 <div class="mb-3">
-                    <label for="age" class="form-label">Age</label>
+                    <label for="age">Age</label>
                     <input id="age" type="number" min="0" max="120" th:field="*{patientProfile.age}" class="form-control" required />
+                    <div class="invalid-feedback"></div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label d-block">Gender</label>
+                    <label>Gender</label>
                     <div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" id="genderM" value="Male" required />
+                            <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" id="genderM" value="Male" />
                             <label class="form-check-label" for="genderM">Male</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" id="genderF" value="Female">
+                            <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" id="genderF" value="Female" />
                             <label class="form-check-label" for="genderF">Female</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" id="genderO" value="Other">
+                            <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" id="genderO" value="Other" />
                             <label class="form-check-label" for="genderO">Other</label>
                         </div>
+                        <div class="invalid-feedback"></div>
                     </div>
                 </div>
 
                 <div class="btn-group">
-                    <button type="button" class="btn btn-primary ms-auto" onclick="nextStep()">Next</button>
+                    <button type="button" class="btn btn-primary ms-auto" onclick="nextStep(event)">Next</button>
                 </div>
-
-                <p>Aready have an account? <a href="/login">Login Here</a></p>
-
             </div>
-            <!-- Step 2: Address & Payment -->
+
+            <!-- Step 2: Address -->
             <div class="form-step" id="step2">
-                <div class="mb-3 row">
-                    <div class="col-6">
-                        <label for="city" class="form-label">City</label>
-                        <input id="city" type="text" th:field="*{patientProfile.city}" class="form-control" required />
-                    </div>
-                    <div class="col-6">
-                        <label for="state" class="form-label">State</label>
-                        <input id="state" type="text" th:field="*{patientProfile.state}" class="form-control" required />
-                    </div>
+                <div class="mb-3">
+                    <label for="city">City</label>
+                    <input id="city" type="text" th:field="*{patientProfile.city}" class="form-control" required />
+                    <div class="invalid-feedback"></div>
                 </div>
-                <div class="mb-3 row">
-                    <div class="col-6">
-                        <label for="country" class="form-label">Country</label>
-                        <input id="country" type="text" th:field="*{patientProfile.country}" class="form-control" required />
-                    </div>
-                    <div class="col-6">
-                        <label for="zipCode" class="form-label">Postal / Zip Code</label>
-                        <input id="zipCode" type="text" th:field="*{patientProfile.zipCode}" class="form-control" required />
-                    </div>
+                <div class="mb-3">
+                    <label for="state">State</label>
+                    <input id="state" type="text" th:field="*{patientProfile.state}" class="form-control" required />
+                    <div class="invalid-feedback"></div>
                 </div>
-                <hr />
+                <div class="mb-3">
+                    <label for="country">Country</label>
+                    <input id="country" type="text" th:field="*{patientProfile.country}" class="form-control" required />
+                    <div class="invalid-feedback"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="zipCode">Postal / Zip Code</label>
+                    <input id="zipCode" type="text" th:field="*{patientProfile.zipCode}" class="form-control" required />
+                    <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button type="button" class="btn btn-primary ms-auto" onclick="nextStep(event)">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Payment & Emergency Contact -->
+            <div class="form-step" id="step3">
                 <h5 class="mb-3">Payment Details</h5>
                 <div class="mb-3">
-                    <label for="cardName" class="form-label">Cardholder Name</label>
+                    <label for="cardName">Cardholder Name</label>
                     <input id="cardName" type="text" th:field="*{patientProfile.cardName}" class="form-control" required />
+                    <div class="invalid-feedback"></div>
                 </div>
                 <div class="mb-3 row">
                     <div class="col-8">
-                        <label for="cardNumber" class="form-label">Card Number</label>
-                        <input id="cardNumber" type="text" maxlength="19" th:field="*{patientProfile.cardNumber}" class="form-control" required />
+                        <label for="cardNumber">Card Number</label>
+                        <input id="cardNumber" type="text" maxlength="16" th:field="*{patientProfile.cardNumber}" class="form-control" required />
+                        <div class="invalid-feedback"></div>
                     </div>
                     <div class="col-4">
-                        <label for="cvv" class="form-label">CVV</label>
-                        <input id="cvv" type="text" maxlength="4" th:field="*{patientProfile.cvv}" class="form-control" required />
+                        <label for="cvv">CVV</label>
+                        <input id="cvv" type="text" maxlength="3" th:field="*{patientProfile.cvv}" class="form-control" required />
+                        <div class="invalid-feedback"></div>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="emergencyContact" class="form-label">Emergency Contact Number</label>
+                    <label for="emergencyContact">Emergency Contact Number</label>
                     <input id="emergencyContact" type="text" th:field="*{patientProfile.emergencyContact}" class="form-control" />
+                    <div class="invalid-feedback"></div>
                 </div>
+
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary" onclick="prevStep()">Back</button>
-                    <button type="submit" class="btn btn-success">Sign Up</button>
+                    <button type="submit" class="btn btn-success ms-auto">Sign Up</button>
                 </div>
             </div>
+
         </form>
+        <p>Already have an account? <a href="/login">Login Here</a></p>
     </div>
-    <!-- Always equal height/width with form on the left and image on the right -->
-    <div class="image-side equal-panel"></div>
 </div>
+
 <script>
     let currentStep = 1;
-    function nextStep() {
-        if (currentStep < 2) {
+
+    function nextStep(event) {
+        if (event) event.preventDefault();
+        if (validateStep(currentStep)) {
             document.getElementById('step' + currentStep).classList.remove('active');
             currentStep++;
             document.getElementById('step' + currentStep).classList.add('active');
         }
     }
+
     function prevStep() {
-        if (currentStep > 1) {
-            document.getElementById('step' + currentStep).classList.remove('active');
-            currentStep--;
-            document.getElementById('step' + currentStep).classList.add('active');
+        document.getElementById('step' + currentStep).classList.remove('active');
+        currentStep--;
+        document.getElementById('step' + currentStep).classList.add('active');
+    }
+
+    function validateStep(step) {
+        const stepDiv = document.getElementById('step' + step);
+        const inputs = stepDiv.querySelectorAll('input[required]');
+        let valid = true;
+
+        inputs.forEach(input => {
+            const value = input.value.trim();
+            const feedback = input.nextElementSibling;
+            feedback.textContent = '';
+            input.classList.remove('is-invalid');
+
+            if (!value) {
+                feedback.textContent = 'This field is required';
+                input.classList.add('is-invalid');
+                valid = false;
+            } else {
+                switch(input.id) {
+                    case 'fullName':
+                        if (/[^a-zA-Z\s]/.test(value)) { feedback.textContent='Name must contain only letters'; input.classList.add('is-invalid'); valid=false;}
+                        break;
+                    case 'email':
+                        if (!value.endsWith('@gmail.com')) { feedback.textContent='Email must be a Gmail address'; input.classList.add('is-invalid'); valid=false;}
+                        break;
+                    case 'phoneNumber':
+                        if (!/^\d{10}$/.test(value)) { feedback.textContent='Phone number must be 10 digits'; input.classList.add('is-invalid'); valid=false;}
+                        break;
+                    case 'zipCode':
+                        if (!/^[a-zA-Z0-9]{5,6}$/.test(value)) { feedback.textContent='Invalid postal/zip code'; input.classList.add('is-invalid'); valid=false;}
+                        break;
+                    case 'cardNumber':
+                        if (!/^\d{16}$/.test(value)) { feedback.textContent='Card number must be 16 digits'; input.classList.add('is-invalid'); valid=false;}
+                        break;
+                    case 'cvv':
+                        if (!/^\d{3}$/.test(value)) { feedback.textContent='CVV must be 3 digits'; input.classList.add('is-invalid'); valid=false;}
+                        break;
+                }
+            }
+        });
+
+        // Gender validation for step 1
+        if (step === 1) {
+            const radios = stepDiv.querySelectorAll('input[type="radio"]');
+            const checked = Array.from(radios).some(r => r.checked);
+            const feedbackDiv = stepDiv.querySelector('.invalid-feedback:last-of-type');
+            if (!checked) {
+                feedbackDiv.textContent = 'Please select your gender';
+                radios.forEach(r => r.classList.add('is-invalid'));
+                valid = false;
+            } else {
+                feedbackDiv.textContent = '';
+                radios.forEach(r => r.classList.remove('is-invalid'));
+            }
         }
+
+        return valid;
     }
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,28 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Doctor Signup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: #f4f8fc;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2.5rem;
+            padding: 2.5rem;
+        }
+        .equal-panel {
+            flex: 1 1 0;
+            max-width: 520px;
+            min-width: 340px;
+            min-height: 560px;
+            border-radius: 1.1rem;
+            box-shadow: 0 8px 32px rgba(16, 60, 120, 0.07);
+            background: #fff;
+            padding: 2.6rem 2.2rem 2rem 2.2rem;
+        }
+        .form-title {
+            color: #124c78;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        label {
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            margin-top: 0.25rem;
+            border-radius: 0.6rem;
+            border: 1px solid #ced4da;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.15rem rgba(0,123,255,.25);
+        }
+        input.is-invalid {
+            border-color: #dc3545;
+        }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        button {
+            margin-top: 2rem;
+            width: 100%;
+            padding: 0.7rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 0.6rem;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        p {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        @media (max-width: 600px) {
+            .equal-panel { padding: 1.5rem 1rem; }
+        }
+    </style>
 </head>
 <body>
-<form method="post" action="/register/doctor" th:object="${user}">
-    <label>Full Name:</label>
-    <input type="text" th:field="*{fullName}" required /><br />
 
-    <label>Email:</label>
-    <input type="email" th:field="*{email}" required /><br />
+<div class="main-wrap">
+    <div class="equal-panel">
+        <h2 class="form-title">Doctor Signup</h2>
+        <form id="doctorForm" method="post" action="/register/doctor" th:object="${user}" novalidate>
+            <label for="fullName">Full Name</label>
+            <input type="text" th:field="*{fullName}" id="fullName" required />
+            <div class="invalid-feedback"></div>
 
-    <label>Password:</label>
-    <input type="password" th:field="*{password}" required /><br />
+            <label for="email">Email</label>
+            <input type="email" th:field="*{email}" id="email" required />
+            <div class="invalid-feedback"></div>
 
-    <label>Phone Number:</label>
-    <input type="text" th:field="*{phoneNumber}" required /><br />
+            <label for="password">Password</label>
+            <input type="password" th:field="*{password}" id="password" required />
+            <div class="invalid-feedback"></div>
 
-    <label>Specialization:</label>
-    <input type="text" name="specialization" required /><br />
+            <label for="phoneNumber">Phone Number</label>
+            <input type="text" th:field="*{phoneNumber}" id="phoneNumber" required />
+            <div class="invalid-feedback"></div>
 
-    <button type="submit">Register as Doctor</button>
-</form>
+            <label for="specialization">Specialization</label>
+            <input type="text" name="specialization" id="specialization" required />
+            <div class="invalid-feedback"></div>
+
+            <button type="submit">Register as Doctor</button>
+        </form>
+        <p>Already have an account? <a href="/login">Login here</a></p>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('doctorForm');
+
+    form.addEventListener('submit', function(event) {
+        let valid = true;
+
+        // Clear previous errors
+        const inputs = form.querySelectorAll('input[required]');
+        inputs.forEach(input => {
+            input.classList.remove('is-invalid');
+            input.nextElementSibling.textContent = '';
+        });
+
+        // Full name validation (only letters and spaces)
+        const name = document.getElementById('fullName');
+        if (!/^[a-zA-Z\s]+$/.test(name.value.trim())) {
+            name.classList.add('is-invalid');
+            name.nextElementSibling.textContent = 'Name must contain only letters';
+            valid = false;
+        }
+
+        // Email validation (must be Gmail)
+        const email = document.getElementById('email');
+        if (!email.value.trim().endsWith('@gmail.com')) {
+            email.classList.add('is-invalid');
+            email.nextElementSibling.textContent = 'Email must be a Gmail address';
+            valid = false;
+        }
+
+        // Password validation (min 6 chars)
+        const password = document.getElementById('password');
+        if (password.value.trim().length < 6) {
+            password.classList.add('is-invalid');
+            password.nextElementSibling.textContent = 'Password must be at least 6 characters';
+            valid = false;
+        }
+
+        // Phone number validation (10 digits)
+        const phone = document.getElementById('phoneNumber');
+        if (!/^\d{10}$/.test(phone.value.trim())) {
+            phone.classList.add('is-invalid');
+            phone.nextElementSibling.textContent = 'Phone number must be 10 digits';
+            valid = false;
+        }
+
+        // Specialization validation (letters only)
+        const spec = document.getElementById('specialization');
+        if (!/^[a-zA-Z\s]+$/.test(spec.value.trim())) {
+            spec.classList.add('is-invalid');
+            spec.nextElementSibling.textContent = 'Specialization must contain only letters';
+            valid = false;
+        }
+
+        if (!valid) {
+            event.preventDefault(); // prevent form submission if validation fails
+        }
+    });
+</script>
 
 </body>
 </html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>My Appointments</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #eef2f7, #ffffff);
+      color: #343a40;
+      margin: 0;
+    }
+
+    .main-content {
+      /*margin-left: 260px;*/
+      padding: 2.5rem 3rem;
+      min-height: 100vh;
+    }
+
+    h2 {
+      font-weight: 700;
+      font-size: 2rem;
+      color: #2c3e50;
+      margin-bottom: 1.8rem;
+      border-bottom: 2px solid #dbe4f3;
+      padding-bottom: 0.5rem;
+    }
+
+    .table {
+      border-collapse: separate !important;
+      border-spacing: 0 12px !important;
+      width: 100%;
+    }
+
+    .table thead tr th {
+      background-color: #e9f0fb;
+      color: #2c3e50;
+      font-weight: 700;
+      border: none;
+      padding: 12px 15px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .table tbody tr {
+      background-color: white;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+      transition: 0.2s;
+    }
+
+    .table tbody tr:hover {
+      background-color: #f0f7ff;
+      transform: translateY(-2px);
+    }
+
+    .table td {
+      vertical-align: middle;
+      padding: 1rem 1.4rem;
+      color: #495057;
+      font-weight: 500;
+    }
+
+    .badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-pending {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .badge-confirmed {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .badge-cancelled {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      border: none;
+      color: white;
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-danger:hover {
+      background-color: #b02a37;
+      box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+
+<main class="main-content">
+  <h2>My Upcoming Appointments</h2>
+
+  <div th:if="${appointments != null and #lists.isEmpty(appointments) == false}" class="table-responsive">
+    <table class="table align-middle mx-auto">
+
+    <thead>
+      <tr>
+        <th scope="col">Date</th>
+        <th scope="col">Time</th>
+        <th scope="col">Doctor</th>
+        <th scope="col">Specialization</th>
+        <th scope="col">Status</th>
+        <th scope="col" class="text-center">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="appt : ${appointments}">
+        <td data-label="Date" th:text="${#temporals.format(appt.date, 'dd MMM yyyy')}">01 Aug 2025</td>
+        <td data-label="Time" th:text="${appt.slot}">10:00 AM</td>
+        <td data-label="Doctor" th:text="${appt.doctorName}">Dr. John</td>
+        <td data-label="Specialization" th:text="${appt.specialization}">Cardiology</td>
+        <td data-label="Status">
+            <span th:switch="${appt.status.name()}">
+              <span th:case="'PENDING'" class="badge badge-pending">Pending</span>
+              <span th:case="'CONFIRMED'" class="badge badge-confirmed">Confirmed</span>
+              <span th:case="'CANCELLED'" class="badge badge-cancelled">Cancelled</span>
+            </span>
+        </td>
+        <td class="text-center">
+          <button th:onclick="'withdrawAppointment(' + ${appt.id} + ')'" class="btn btn-danger btn-sm">
+            Withdraw
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div th:if="${appointments == null or #lists.isEmpty(appointments)}" class="py-4 text-center text-muted fs-5">
+    You have no upcoming appointments.
+  </div>
+</main>
+
+<script>
+  function withdrawAppointment(apptId) {
+    if (!confirm("Are you sure you want to withdraw this appointment?")) return;
+    fetch(`/patient/delete-appointment/${apptId}`, { method: 'DELETE' })
+            .then(res => res.text())
+            .then(result => {
+              if (result === 'success') {
+                alert("Appointment withdrawn successfully.");
+                location.reload();
+              } else {
+                alert("Error: Could not withdraw appointment.");
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              alert("An error occurred.");
+            });
+  }
+</script>
+
+</body>
+</html>

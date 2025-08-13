@@ -14,7 +14,6 @@ public class DoctorProfile {
     private User user;
 
     private String specialization;
-    private String medicalLicenseNumber; // optional
 
     public Long getId() {
         return id;
@@ -40,11 +39,4 @@ public class DoctorProfile {
         this.specialization = specialization;
     }
 
-    public String getMedicalLicenseNumber() {
-        return medicalLicenseNumber;
-    }
-
-    public void setMedicalLicenseNumber(String medicalLicenseNumber) {
-        this.medicalLicenseNumber = medicalLicenseNumber;
-    }
 }

@@ -1,10 +1,9 @@
 package org.ishika.demo_security.controller;
 
 import org.ishika.demo_security.Repository.AppointmentRepository;
+import org.ishika.demo_security.Repository.DoctorProfileRepository;
 import org.ishika.demo_security.Repository.UserRepository;
-import org.ishika.demo_security.model.Appointment;
-import org.ishika.demo_security.model.AppointmentStatus;
-import org.ishika.demo_security.model.User;
+import org.ishika.demo_security.model.*;
 import org.ishika.demo_security.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,8 +11,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import javax.print.Doc;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +33,8 @@ public class DoctorController {
 
     @Autowired
     private AppointmentService appointmentService;
+    @Autowired
+    private DoctorProfileRepository doctorProfileRepository;
 
 
     @Autowired
@@ -110,6 +116,51 @@ public class DoctorController {
         return "redirect:/doctor/dashboard";
     }
 
+    @GetMapping("/profile")
+    public String doctorProfile(Model model, Principal principal) {
+        // Fetch current user entity
+        User user = userRepository.findByEmail(principal.getName());
+
+        if (user == null) {
+            return "redirect:/login?error";
+        }
+
+        // Fetch DoctorProfile using your entity
+        DoctorProfile doctorProfile = doctorProfileRepository.findByUser(user);
+
+        // Wrap in form object
+        DoctorRegistrationForm form = new DoctorRegistrationForm();
+        form.setUser(user);
+        form.setDoctorProfile(doctorProfile);
+
+        model.addAttribute("form", form);
+        return "doctor-profile";
+    }
+
+
+    @PostMapping("/profile")
+    public String updateDoctorProfile(@ModelAttribute("form") DoctorRegistrationForm form, Principal principal) {
+        User currentUser = userRepository.findByEmail(principal.getName());
+        if (currentUser == null) {
+            return "redirect:/doctor/dashboard";
+        }
+
+        currentUser.setPhoneNumber(form.getUser().getPhoneNumber());
+
+        userRepository.save(currentUser);
+
+        DoctorProfile currentProfile = currentUser.getDoctorProfile();
+        if (currentProfile != null && form.getDoctorProfile() != null) {
+            DoctorProfile formProfile = form.getDoctorProfile();
+            currentProfile.setSpecialization(formProfile.getSpecialization());
+
+            // Save profile
+            doctorProfileRepository.save(currentProfile);
+        }
+
+        return "redirect:/doctor/dashboard";
+    }
+
 
     @GetMapping("/booked-slots/{doctorId}")
     @ResponseBody
@@ -122,9 +173,49 @@ public class DoctorController {
     public String doctorCalendar(Model model, Principal principal) {
         User doctor = userRepository.findByEmail(principal.getName());
         if (doctor == null) return "redirect:/login?error";
+
         List<Appointment> appointments = appointmentRepository.findByDoctorId(doctor.getId());
-        model.addAttribute("appointments", appointments);
-        return "doctor-calendar"; // New Thymeleaf template for calendar view
+
+        List<Map<String, Object>> calendarEvents = appointments.stream().map(appt -> {
+            Map<String, Object> event = new HashMap<>();
+
+            // Fetch patient name
+            User patient = userRepository.findById(appt.getPatientId()).orElse(null);
+            String patientName = (patient != null) ? patient.getFullName() : "Patient #" + appt.getPatientId();
+
+            // Extract start time from slot
+            String slot = appt.getSlot();
+            String startTimeStr = slot.contains("–") ? slot.split("–")[0].trim() : slot;
+
+            LocalTime startTime;
+            try {
+                startTime = LocalTime.parse(startTimeStr, DateTimeFormatter.ofPattern("hh:mm a"));
+            } catch (Exception e) {
+                startTime = LocalTime.parse(startTimeStr, DateTimeFormatter.ofPattern("HH:mm"));
+            }
+
+            // Pass separate fields for frontend customization
+            event.put("patientName", patientName);
+            event.put("slot", appt.getSlot());
+            event.put("status", appt.getStatus().name());
+            event.put("start", appt.getDate().toString() + "T" + startTime.toString());
+            event.put("allDay", false);
+
+            // Optional: keep title empty so frontend uses custom layout
+            event.put("title", "");
+
+            // Colors by status
+            event.put("color", appt.getStatus() == AppointmentStatus.CONFIRMED ? "#28a745"
+                    : appt.getStatus() == AppointmentStatus.PENDING ? "#ffc107" : "#dc3545");
+
+            return event;
+        }).toList();
+
+        model.addAttribute("calendarEvents", calendarEvents);
+
+        return "doctor-calendar";
     }
+
+
 
 }
