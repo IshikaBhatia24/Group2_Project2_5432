@@ -268,7 +268,7 @@
                 <tbody>
                 <tr th:each="appt : ${appointments}">
                     <!-- Assuming appt.date is a LocalDate and appt.slot contains time info -->
-                    <td data-label="Date" th:text="${#dates.format(appt.date, 'dd MMM yyyy')}">01 Aug 2025</td>
+                    <td data-label="Date" th:text="${#temporals.format(appt.date, 'dd MMM yyyy')}">01 Aug 2025</td>
                     <td data-label="Time" th:text="${appt.slot}">10:00 AM</td>
                     <td data-label="Doctor" th:text="${appt.doctorName}">Dr. John</td>
                     <td data-label="Specialization" th:text="${appt.specialization}">Cardiology</td>

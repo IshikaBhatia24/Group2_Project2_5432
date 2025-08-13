@@ -2,20 +2,115 @@
 <html>
 <head>
     <title>Register</title>
+    <style>
+        /* Reset some default styles */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 320px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #2575fc;
+            font-weight: 700;
+        }
+
+        p {
+            margin-bottom: 25px;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #2575fc;
+            color: white;
+            padding: 12px 30px;
+            margin: 10px 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 6px 15px rgba(37, 117, 252, 0.4);
+            user-select: none;
+        }
+
+        .btn:hover,
+        .btn:focus {
+            background-color: #1a54d2;
+            box-shadow: 0 8px 20px rgba(26, 84, 210, 0.6);
+            outline: none;
+        }
+
+        .login-link {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .login-link a {
+            color: #2575fc;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .container {
+                width: 90%;
+                padding: 30px 20px;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
 </head>
 <body>
-<h2>Register</h2>
+<div class="container">
+    <h2>Register</h2>
 
-<p>Please choose your registration type:</p>
+    <p>Please choose your registration type:</p>
 
-<a href="/register/patient">
-    <button type="button">Register as Patient</button>
-</a>
+    <a href="/register/patient">
+        <button type="button" class="btn">Register as Patient</button>
+    </a>
 
-<a href="/register/doctor">
-    <button type="button">Register as Doctor</button>
-</a>
+    <a href="/register/doctor">
+        <button type="button" class="btn">Register as Doctor</button>
+    </a>
 
-<p>Already have an account? <a href="/login">Login here</a></p>
+    <p class="login-link">Already have an account? <a href="/login">Login here</a></p>
+</div>
 </body>
 </html>

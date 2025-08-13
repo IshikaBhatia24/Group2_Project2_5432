@@ -3,156 +3,200 @@
 <head>
     <meta charset="UTF-8" />
     <title>Register as Patient</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        body {
-            min-height: 100vh;
+        html, body {
+            height: 100%;
             margin: 0;
-            display: flex;
-            align-items: stretch;
             background: #f4f8fc;
         }
-        .form-side {
-            min-width: 400px;
-            width: 40%;
-            max-width: 480px;
-            background: rgba(255,255,255,0.93);
+        .main-wrap {
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.09);
-            position: relative;
-            z-index: 2;
+            gap: 2.5rem;
+            padding: 2.5rem;
         }
-        .form-container {
-            width: 100%;
-            padding: 2.5rem 2rem;
+        .equal-panel {
+            flex: 1 1 0;
+            max-width: 520px;
+            min-width: 340px;
+            min-height: 560px;
+            height: 100%;
+            border-radius: 1.1rem;
+            box-shadow: 0 8px 32px rgba(16, 60, 120, 0.07);
+        }
+        .reg-card {
+            background: #fff;
+            padding: 2.6rem 2.2rem 2rem 2.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        p{
+            text-align: center;
         }
         .form-title {
-            font-weight: 700;
-            font-size: 2rem;
             color: #124c78;
-            letter-spacing: 0.04em;
-            margin-bottom: 1.6rem;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.02em;
+            text-align: center;
         }
-        .background-img-side {
-            flex: 1;
-            background: url('https://images.unsplash.com/photo-1519494080410-f9aa79b8ae3c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bWVkaWNhbCUyMGJhY2tncm91bmR8ZW58MHx8MHx8&auto=format&fit=crop&w=900&q=80') center center / cover no-repeat;
-            filter: brightness(0.93) contrast(1.02);
-        }
-        .next-btn { float: right; }
-        .back-btn { float: left; }
         .form-step { display: none; }
         .form-step.active { display: block; }
-        .gender-select label { margin-right: 1.5rem; }
+        .form-control, .form-check-input { border-radius: 0.6rem; }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+        .image-side {
+            background: url('/images/image2.jpg') center center / cover no-repeat;
+        }
+        @media (max-width: 1200px) {
+            .main-wrap { gap: 1.2rem; padding: 1.2rem; }
+            .equal-panel { min-width: 240px; max-width: 410px; }
+        }
+        @media (max-width: 900px) {
+            .main-wrap {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1.2rem;
+            }
+            .equal-panel { max-width: 95vw; min-height: 320px; }
+        }
+        @media (max-width: 600px) {
+            .main-wrap { padding: 0.5rem; }
+            .equal-panel { min-width: unset; max-width: 98vw; padding: 1.4rem 0.6rem; }
+            .image-side { display: none; }
+        }
     </style>
 </head>
 <body>
-
-<div class="form-side">
-    <div class="form-container">
-        <h2 class="form-title">Patient Sign Up</h2>
-        <!-- Bind to the single DTO wrapper DTO object 'form' -->
+<div class="main-wrap">
+    <div class="reg-card equal-panel">
+        <div class="form-title">Sign Up</div>
         <form method="post" action="/register/patient" th:object="${form}" autocomplete="off">
             <!-- Step 1: Basic Info -->
             <div class="form-step active" id="step1">
                 <div class="mb-3">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" th:field="*{user.fullName}" required class="form-control"/>
+                    <label for="fullName" class="form-label">Full Name</label>
+                    <input id="fullName" type="text" th:field="*{user.fullName}" class="form-control" required />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" th:field="*{user.email}" required class="form-control"/>
+                    <label for="email" class="form-label">Email</label>
+                    <input id="email" type="email" th:field="*{user.email}" class="form-control" required />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password" th:field="*{user.password}" required class="form-control"/>
+                    <label for="password" class="form-label">Password</label>
+                    <input id="password" type="password" th:field="*{user.password}" class="form-control" required />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Phone Number</label>
-                    <input type="text" th:field="*{user.phoneNumber}" required class="form-control"/>
+                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                    <input id="phoneNumber" type="text" th:field="*{user.phoneNumber}" class="form-control" required />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Age</label>
-                    <input type="number" th:field="*{patientProfile.age}" min="0" max="120" required class="form-control"/>
+                    <label for="age" class="form-label">Age</label>
+                    <input id="age" type="number" min="0" max="120" th:field="*{patientProfile.age}" class="form-control" required />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label me-3">Gender</label>
-                    <div class="gender-select form-check form-check-inline">
-                        <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" name="gender" id="genderM" value="Male" required>
-                        <label class="form-check-label" for="genderM">Male</label>
-                        <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" name="gender" id="genderF" value="Female">
-                        <label class="form-check-label" for="genderF">Female</label>
-                        <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" name="gender" id="genderO" value="Other">
-                        <label class="form-check-label" for="genderO">Other</label>
+                    <label class="form-label d-block">Gender</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" id="genderM" value="Male" required />
+                            <label class="form-check-label" for="genderM">Male</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" id="genderF" value="Female">
+                            <label class="form-check-label" for="genderF">Female</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" th:field="*{patientProfile.gender}" id="genderO" value="Other">
+                            <label class="form-check-label" for="genderO">Other</label>
+                        </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary next-btn" onclick="nextStep()">Next</button>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary ms-auto" onclick="nextStep()">Next</button>
+                </div>
+
+                <p>Aready have an account? <a href="/login">Login Here</a></p>
+
             </div>
             <!-- Step 2: Address & Payment -->
             <div class="form-step" id="step2">
                 <div class="mb-3 row">
                     <div class="col-6">
-                        <label class="form-label">City</label>
-                        <input type="text" th:field="*{patientProfile.city}" class="form-control" required/>
+                        <label for="city" class="form-label">City</label>
+                        <input id="city" type="text" th:field="*{patientProfile.city}" class="form-control" required />
                     </div>
                     <div class="col-6">
-                        <label class="form-label">State</label>
-                        <input type="text" th:field="*{patientProfile.state}" class="form-control" required/>
+                        <label for="state" class="form-label">State</label>
+                        <input id="state" type="text" th:field="*{patientProfile.state}" class="form-control" required />
                     </div>
                 </div>
                 <div class="mb-3 row">
                     <div class="col-6">
-                        <label class="form-label">Country</label>
-                        <input type="text" th:field="*{patientProfile.country}" class="form-control" required/>
+                        <label for="country" class="form-label">Country</label>
+                        <input id="country" type="text" th:field="*{patientProfile.country}" class="form-control" required />
                     </div>
                     <div class="col-6">
-                        <label class="form-label">Postal/Zip Code</label>
-                        <input type="text" th:field="*{patientProfile.zipCode}" class="form-control" required/>
+                        <label for="zipCode" class="form-label">Postal / Zip Code</label>
+                        <input id="zipCode" type="text" th:field="*{patientProfile.zipCode}" class="form-control" required />
                     </div>
                 </div>
-                <hr>
-                <h6 class="mb-3 mt-2">Payment Details</h6>
+                <hr />
+                <h5 class="mb-3">Payment Details</h5>
                 <div class="mb-3">
-                    <label class="form-label">Cardholder Name</label>
-                    <input type="text" th:field="*{patientProfile.cardName}" class="form-control" required/>
+                    <label for="cardName" class="form-label">Cardholder Name</label>
+                    <input id="cardName" type="text" th:field="*{patientProfile.cardName}" class="form-control" required />
                 </div>
                 <div class="mb-3 row">
                     <div class="col-8">
-                        <label class="form-label">Card Number</label>
-                        <input type="text" th:field="*{patientProfile.cardNumber}" maxlength="19" class="form-control" required/>
+                        <label for="cardNumber" class="form-label">Card Number</label>
+                        <input id="cardNumber" type="text" maxlength="19" th:field="*{patientProfile.cardNumber}" class="form-control" required />
                     </div>
                     <div class="col-4">
-                        <label class="form-label">CVV</label>
-                        <input type="text" th:field="*{patientProfile.cvv}" maxlength="4" class="form-control" required/>
+                        <label for="cvv" class="form-label">CVV</label>
+                        <input id="cvv" type="text" maxlength="4" th:field="*{patientProfile.cvv}" class="form-control" required />
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Emergency Contact Number</label>
-                    <input type="text" th:field="*{patientProfile.emergencyContact}" class="form-control"/>
+                    <label for="emergencyContact" class="form-label">Emergency Contact Number</label>
+                    <input id="emergencyContact" type="text" th:field="*{patientProfile.emergencyContact}" class="form-control" />
                 </div>
-                <button type="button" class="btn btn-secondary back-btn" onclick="prevStep()">Back</button>
-                <button type="submit" class="btn btn-success next-btn">Sign Up</button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button type="submit" class="btn btn-success">Sign Up</button>
+                </div>
             </div>
         </form>
     </div>
+    <!-- Always equal height/width with form on the left and image on the right -->
+    <div class="image-side equal-panel"></div>
 </div>
-<div class="background-img-side"></div>
-
 <script>
     let currentStep = 1;
     function nextStep() {
-        document.getElementById('step' + currentStep).classList.remove('active');
-        currentStep++;
-        document.getElementById('step' + currentStep).classList.add('active');
+        if (currentStep < 2) {
+            document.getElementById('step' + currentStep).classList.remove('active');
+            currentStep++;
+            document.getElementById('step' + currentStep).classList.add('active');
+        }
     }
     function prevStep() {
-        document.getElementById('step' + currentStep).classList.remove('active');
-        currentStep--;
-        document.getElementById('step' + currentStep).classList.add('active');
+        if (currentStep > 1) {
+            document.getElementById('step' + currentStep).classList.remove('active');
+            currentStep--;
+            document.getElementById('step' + currentStep).classList.add('active');
+        }
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

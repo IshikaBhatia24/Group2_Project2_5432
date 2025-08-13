@@ -20,6 +20,8 @@ import java.util.Optional;
 @RequestMapping("/patient")
 public class PatientController {
 
+
+
     @Autowired
     private UserRepository userRepository;
 
@@ -72,22 +74,31 @@ public class PatientController {
                                   @RequestParam String details,
                                   Principal principal) {
 
+        LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+
         User doctor = userRepository.findById(doctorId).orElse(null);
         User patient = userRepository.findByEmail(principal.getName());
 
         if (doctor == null || patient == null) return "Invalid doctor or patient.";
 
-        List<Appointment> existingAppointments = appointmentRepository.findByDoctorIdAndSlotAndStatusNot(doctorId, slot, AppointmentStatus.CANCELLED);
+//        List<Appointment> existingAppointments = appointmentRepository
+//                .findByDoctorIdAndDateAndSlotAndStatusNot(doctorId, parsedDate, slot, AppointmentStatus.CANCELLED);
+//        if (!existingAppointments.isEmpty()) {
+//            return "Appointment slot is already taken.";
+//        }
 
-        if (!existingAppointments.isEmpty()) {
-            return "Appointment slot is already taken.";
+        // Check if already confirmed appointment exists for the doctor, slot, and date:
+        List<Appointment> confirmedAppointments = appointmentRepository
+                .findByDoctorIdAndDateAndSlotAndStatus(doctorId, parsedDate, slot, AppointmentStatus.CONFIRMED);
+
+        if (!confirmedAppointments.isEmpty()) {
+            return "This slot is already confirmed for another patient.";
         }
 
 
         Appointment appt = new Appointment();
         appt.setDoctorId(doctor.getId());
         appt.setDoctorName(doctor.getFullName());
-        //appt.setSpecialization(doctor.getSpecialization());
         if (doctor.getDoctorProfile() != null) {
             appt.setSpecialization(doctor.getDoctorProfile().getSpecialization());
         } else {
@@ -99,7 +110,7 @@ public class PatientController {
         appt.setDetails(details);
         appt.setPatientId(patient.getId());
 
-        LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+//        LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
         appt.setDate(parsedDate);
 
         appt.setStatus(AppointmentStatus.PENDING);
@@ -145,21 +156,36 @@ public class PatientController {
 
 
     @PostMapping("/profile")
-    public String updatePatientProfile(@ModelAttribute("patient") User updatedPatient, Principal principal) {
-        // Load current patient from DB
-        User patient = userRepository.findByEmail(principal.getName());
-        if (patient == null) {
-            // handle error (redirect or message)
+    public String updatePatientProfile(@ModelAttribute("form") PatientRegistrationForm form, Principal principal) {
+        User currentUser = userRepository.findByEmail(principal.getName());
+        if (currentUser == null) {
             return "redirect:/patient/profile?error";
         }
 
-        // Update editable fields - be careful not to overwrite sensitive fields
-        patient.setFullName(updatedPatient.getFullName());
-        patient.setPhoneNumber(updatedPatient.getPhoneNumber());
-        // You can add more editable fields if you want
+        // Update user fields
+        currentUser.setPhoneNumber(form.getUser().getPhoneNumber());
+        // If you want to allow name edit, uncomment:
+        // currentUser.setFullName(form.getUser().getFullName());
 
-        // Save updated patient data
-        userRepository.save(patient);
+        userRepository.save(currentUser);
+
+        // Update PatientProfile fields
+        PatientProfile currentProfile = currentUser.getPatientProfile();
+        if (currentProfile != null && form.getPatientProfile() != null) {
+            PatientProfile formProfile = form.getPatientProfile();
+            currentProfile.setAge(formProfile.getAge());
+            currentProfile.setGender(formProfile.getGender());
+            currentProfile.setCity(formProfile.getCity());
+            currentProfile.setState(formProfile.getState());
+            currentProfile.setCountry(formProfile.getCountry());
+            currentProfile.setZipCode(formProfile.getZipCode());
+            currentProfile.setEmergencyContact(formProfile.getEmergencyContact());
+            // Add more fields here as necessary
+            // e.g. payment info or others
+
+            // Save profile
+            patientProfileRepository.save(currentProfile);
+        }
 
         return "redirect:/patient/profile?success";
     }

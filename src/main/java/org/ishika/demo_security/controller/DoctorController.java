@@ -91,9 +91,25 @@ public class DoctorController {
 
     @PostMapping("/confirm")
     public String confirmAppointment(@RequestParam Long appointmentId) {
-        appointmentService.confirmAppointment(appointmentId);
-        return "redirect:/doctor/dashboard"; // or appropriate view
+        Appointment appt = appointmentRepository.findById(appointmentId).orElseThrow();
+        appt.setStatus(AppointmentStatus.CONFIRMED);
+        appointmentRepository.save(appt);
+
+        List<Appointment> others = appointmentRepository
+                .findByDoctorIdAndDateAndSlotAndStatus(appt.getDoctorId(), appt.getDate(), appt.getSlot(), AppointmentStatus.PENDING);
+
+        for (Appointment other : others) {
+            if (!other.getId().equals(appt.getId())) {
+                other.setStatus(AppointmentStatus.CANCELLED);
+                appointmentRepository.save(other);
+
+                // Send notification email to other.getPatientId()
+                // Use your EmailService here
+            }
+        }
+        return "redirect:/doctor/dashboard";
     }
+
 
     @GetMapping("/booked-slots/{doctorId}")
     @ResponseBody

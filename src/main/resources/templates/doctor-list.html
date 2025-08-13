@@ -1,53 +1,172 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
+    <meta charset="UTF-8" />
     <title>Book a Doctor</title>
     <style>
+        /* Body & general */
         body {
-            font-family: sans-serif;
-            background-color: #f0f0f0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+            Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: #f0f2f5;
             padding: 20px;
+            margin: 0;
+            color: #333;
         }
 
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #007bff;
+            font-weight: 700;
+            font-size: 2rem;
+        }
+
+        /* Doctor Card */
         .doctor-card {
-            background: white;
-            border: 1px solid #ccc;
-            padding: 16px;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 20px 25px;
             margin-bottom: 20px;
-            border-radius: 8px;
+            border-radius: 10px;
+            box-shadow: 0 2px 7px rgba(0, 0, 0, 0.05);
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
+        .doctor-card p {
+            margin: 0.4rem 0 1rem;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        /* Labels & inputs */
+        label {
+            font-weight: 600;
+            display: block;
+            margin: 1rem 0 0.4rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input[type="date"]:focus,
+        select:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+        }
+
+        /* Button */
         .btn {
-            padding: 8px 16px;
-            cursor: pointer;
+            display: inline-block;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
+            padding: 10px 22px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
         }
 
+        .btn:hover,
+        .btn:focus {
+            background-color: #0056b3;
+            box-shadow: 0 6px 15px rgba(0, 86, 179, 0.6);
+            outline: none;
+        }
+
+        /* Modal overlay */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4);
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.35);
             backdrop-filter: blur(3px);
             justify-content: center;
             align-items: center;
+            z-index: 1000;
         }
 
         .modal-content {
             background: white;
-            padding: 20px;
-            width: 400px;
-            border-radius: 8px;
+            padding: 25px 30px;
+            width: 430px;
+            border-radius: 12px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .modal-content p {
+            margin: 0.5rem 0 1.2rem;
+            font-size: 1rem;
+            line-height: 1.4;
         }
 
         .close {
-            float: right;
-            font-size: 20px;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 26px;
+            font-weight: 700;
+            color: #666;
             cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        /* Textareas */
+        textarea {
+            width: 100%;
+            resize: vertical;
+            min-height: 66px;
+            max-height: 140px;
+            padding: 8px 12px;
+            font-size: 1rem;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+        }
+
+        /* Responsive for smaller screens */
+        @media (max-width: 550px) {
+            .doctor-card {
+                width: 90%;
+                padding: 15px 20px;
+            }
+            .modal-content {
+                width: 90%;
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -61,30 +180,25 @@
         <span th:text="${doctor.doctorProfile != null ? doctor.doctorProfile.specialization : 'N/A'}"></span>
     </p>
 
-    <label>Choose Date:</label>
-    <input type="date" id="date-select-[[${iterStat.index}]]" name="date" required />
+    <label for="date-select" th:for="'date-select-' + ${iterStat.index}">Choose Date:</label>
+    <input type="date" th:id="'date-select-' + ${iterStat.index}" name="date" required />
 
-    <label>Choose Slot:</label>
+    <label for="slot-select" th:for="'slot-select-' + ${iterStat.index}">Choose Slot:</label>
     <select th:id="'slot-select-' + ${iterStat.index}">
         <option value="10:00–10:30 AM">10:00–10:30 AM</option>
         <option value="11:00–11:30 AM">11:00–11:30 AM</option>
         <option value="2:00–2:30 PM">2:00–2:30 PM</option>
     </select>
 
-
-
-
     <button class="btn"
             th:attr="
-data-index=${iterStat.index},
-data-doctor-id=${doctor.id},
-data-doctor-name=${doctor.fullName},
-data-specialization=${doctor.doctorProfile != null ? doctor.doctorProfile.specialization : 'N/A'}"
+                data-index=${iterStat.index},
+                data-doctor-id=${doctor.id},
+                data-doctor-name=${doctor.fullName},
+                data-specialization=${doctor.doctorProfile != null ? doctor.doctorProfile.specialization : 'N/A'}"
             onclick="openForm(this)">
         Request
     </button>
-
-
 </div>
 
 <!-- Modal -->
@@ -92,18 +206,18 @@ data-specialization=${doctor.doctorProfile != null ? doctor.doctorProfile.specia
     <div class="modal-content">
         <span class="close" onclick="closeForm()">&times;</span>
         <form id="appointment-form" method="post">
-            <input type="hidden" name="doctorId" id="form-doctorId">
-            <input type="hidden" name="slot" id="form-slot">
+            <input type="hidden" name="doctorId" id="form-doctorId" />
+            <input type="hidden" name="slot" id="form-slot" />
             <input type="hidden" id="form-date" name="date" />
 
             <p><b>Doctor:</b> <span id="form-doctorName"></span></p>
             <p><b>Specialization:</b> <span id="form-specialization"></span></p>
 
-            <label>Emergency:</label><br>
-            <textarea name="emergency" required rows="2" cols="40"></textarea><br><br>
+            <label for="emergency">Emergency:</label><br />
+            <textarea name="emergency" id="emergency" required rows="3" cols="40"></textarea><br /><br />
 
-            <label>Details:</label><br>
-            <textarea name="details" rows="2" cols="40"></textarea><br><br>
+            <label for="details">Details (optional):</label><br />
+            <textarea name="details" id="details" rows="3" cols="40"></textarea><br /><br />
 
             <button type="submit" class="btn">Submit</button>
         </form>
@@ -118,8 +232,15 @@ data-specialization=${doctor.doctorProfile != null ? doctor.doctorProfile.specia
         const specialization = button.dataset.specialization;
 
         const slot = document.getElementById("slot-select-" + index).value;
+        const dateInput = document.getElementById("date-select-" + index);
+        if (!dateInput.value) {
+            alert("Please select a date before proceeding.");
+            return;
+        }
+
         document.getElementById("form-doctorId").value = doctorId;
         document.getElementById("form-slot").value = slot;
+        document.getElementById("form-date").value = dateInput.value;
         document.getElementById("form-doctorName").innerText = doctorName;
         document.getElementById("form-specialization").innerText = specialization;
 
@@ -130,7 +251,15 @@ data-specialization=${doctor.doctorProfile != null ? doctor.doctorProfile.specia
         document.getElementById("appointment-modal").style.display = "none";
     }
 
-    // Submit the form using JavaScript to stay on the same page
+    // Close modal if the user clicks outside the modal content
+    window.onclick = function(event) {
+        const modal = document.getElementById("appointment-modal");
+        if (event.target === modal) {
+            closeForm();
+        }
+    };
+
+    // Submit the form via JavaScript without page reload
     document.getElementById("appointment-form").addEventListener("submit", function (e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -138,15 +267,20 @@ data-specialization=${doctor.doctorProfile != null ? doctor.doctorProfile.specia
         fetch('/patient/book', {
             method: 'POST',
             body: formData
-        }).then(response => response.text())
+        })
+            .then(response => response.text())
             .then(result => {
                 if (result === 'success') {
                     alert("Request Sent!");
                     window.location.href = "/patient/dashboard";
                 } else {
                     alert("Something went wrong!");
+                    console.error("Server response:", result);
                 }
-
+            })
+            .catch(error => {
+                alert("An error occurred.");
+                console.error("Fetch error:", error);
             });
     });
 </script>

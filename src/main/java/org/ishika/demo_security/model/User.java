@@ -74,6 +74,12 @@ public class User {
     }
 // getters and setters
 
+    public PatientProfile getPatientProfile() {return patientProfile;}
+
+    public void setPatientProfile(PatientProfile patientProfile) {
+        this.patientProfile = patientProfile;
+    }
+
     public DoctorProfile getDoctorProfile() {
         return doctorProfile;
     }
